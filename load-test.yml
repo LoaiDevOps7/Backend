@@ -1,0 +1,21 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60        # مدة الاختبار (بالثواني)
+      arrivalRate: 100    # عدد المستخدمين الجدد في كل ثانية
+      rampTo: 1000        # زيادة عدد المستخدمين إلى 1000 خلال الاختبار
+scenarios:
+  - name: "User Register"
+    flow:
+      - post:
+          url: "/api/v1/auth/register"
+          json:
+            password: "TestPassword123"
+            email: "test@example.com"
+  - name: "User Login"
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          json:
+            email: "test@example.com"
+            password: "TestPassword123"
