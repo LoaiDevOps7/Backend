@@ -47,20 +47,24 @@ import { JwtModule } from '@nestjs/jwt';
     TypeOrmModule.forRoot({
       type: 'mysql',
       driver: mysql2,
-      host: process.env.MYSQLHOST,
-      port: +process.env.MYSQLPORT,
-      username: process.env.MYSQLUSER,
-      password: process.env.MYSQLPASSWORD,
-      database: process.env.MYSQLDATABASE,
+      host: process.env.MYSQLHOST || 'localhost', // إضافة قيمة افتراضية للتطوير المحلي
+      port: parseInt(process.env.MYSQLPORT, 10) || 3306,
+      username: process.env.MYSQLUSER || 'LOAI',
+      password: process.env.MYSQLPASSWORD || '1234',
+      database: process.env.MYSQLDATABASE || 'FREELANCER_DB',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
       ssl:
         process.env.NODE_ENV === 'production'
           ? {
-              rejectUnauthorized: false,
+              rejectUnauthorized: true,
+              ca: process.env.MYSQL_SSL_CA, // إضافة شهادة SSL إذا لزم الأمر
             }
           : null,
+      extra: {
+        connectionLimit: 10, // إدارة اتصالات قاعدة البيانات
+      },
     }),
     ServeStaticModule.forRoot({
       // نقدم مجلد "src/infrastructure/storage" كأصول ثابتة
