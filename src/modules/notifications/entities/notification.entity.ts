@@ -29,7 +29,11 @@ export class Notification {
   @Column({ type: 'timestamp', nullable: true })
   scheduledAt: Date;
 
-  @Column({ default: NotificationStatus.SCHEDULED })
+  @Column({
+    type: 'enum',
+    enum: NotificationStatus,
+    default: NotificationStatus.SCHEDULED,
+  })
   status: NotificationStatus;
 
   @Column({ nullable: true })

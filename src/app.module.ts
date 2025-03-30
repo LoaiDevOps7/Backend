@@ -55,6 +55,9 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
+      extra: {
+        connectionLimit: 5, // ← تحديد عدد الاتصالات
+      },
 
       // driver: mysql2,
       // host: process.env.MYSQLHOST || 'localhost', // إضافة قيمة افتراضية للتطوير المحلي

@@ -9,10 +9,11 @@ import { WalletController } from './wallets.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { NotificationModule } from '../notifications/notification.module';
 import { TransactionRepository } from '@/infrastructure/repositories/transaction.repository';
+import { Transaction } from './transactions.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Wallet]),
+    TypeOrmModule.forFeature([Wallet, Transaction]),
     UserModule,
     JwtModule,
     NotificationModule,
