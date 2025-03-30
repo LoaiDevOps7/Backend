@@ -89,20 +89,16 @@ export class AuthController {
     // تعيين الـ cookies مع إعدادات آمنة
     res.cookie('authToken', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN, // تأكد من ضبط هذا المتغير
-      path: '/',
+      sameSite: 'none',
     });
 
     res.cookie('refreshToken', refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
-      path: '/',
+      sameSite: 'none',
     });
 
     return { message: 'Login successful', access_token, refresh_token };
@@ -135,20 +131,16 @@ export class AuthController {
     // تحديث الكوكيز بالتوكنات الجديدة
     res.cookie('authToken', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
-      path: '/',
+      sameSite: 'none',
     });
 
     res.cookie('refreshToken', refresh_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
-      path: '/',
+      sameSite: 'none',
     });
 
     return {
