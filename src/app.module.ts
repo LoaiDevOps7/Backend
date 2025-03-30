@@ -14,7 +14,7 @@ import { SubscriptionModule } from '@/modules/subscriptions/subscription.module'
 import { PackageModule } from '@/modules/packages/package.module';
 import { KycModule } from '@/modules/kyc/kyc.module';
 import { CategoryModule } from '@/modules/categories/categories.module';
-import * as redisStore from 'cache-manager-redis-store';
+import { redisStore } from 'cache-manager-redis-store';
 // import * as mysql2 from 'mysql2';
 import { BidModule } from '@/modules/bids/bid.module';
 import { ProjectModule } from '@/modules/projects/projects.module';
@@ -38,10 +38,15 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
     }),
     PrometheusModule.register(),
     CacheModule.register({
-      store: redisStore,
-      url: process.env.REDIS_URL,
-      ttl: 3600, // 1 hour
-      tls: process.env.NODE_ENV === 'production' ? {} : undefined,
+      isGlobal: true,
+      useFactory: async () => ({
+        store: () =>
+          redisStore({
+            url: process.env.REDIS_URL,
+            ttl: 3600,
+            tls: process.env.NODE_ENV === 'production' ? {} : undefined,
+          }),
+      }),
     }),
     ThrottlerModule.forRoot({
       ttl: 30,
