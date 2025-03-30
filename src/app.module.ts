@@ -15,7 +15,7 @@ import { PackageModule } from '@/modules/packages/package.module';
 import { KycModule } from '@/modules/kyc/kyc.module';
 import { CategoryModule } from '@/modules/categories/categories.module';
 // import * as redisStore from 'cache-manager-redis-store';
-import * as mysql2 from 'mysql2';
+// import * as mysql2 from 'mysql2';
 import { BidModule } from '@/modules/bids/bid.module';
 import { ProjectModule } from '@/modules/projects/projects.module';
 import { WalletModule } from '@/modules/wallets/wallets.module';
@@ -46,25 +46,33 @@ import { JwtModule } from '@nestjs/jwt';
     } as any),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      driver: mysql2,
-      host: process.env.MYSQLHOST || 'localhost', // إضافة قيمة افتراضية للتطوير المحلي
-      port: parseInt(process.env.MYSQLPORT, 10) || 3306,
-      username: process.env.MYSQLUSER || 'LOAI',
-      password: process.env.MYSQLPASSWORD || '1234',
-      database: process.env.MYSQLDATABASE || 'FREELANCER_DB',
+      url: process.env.DATABASE_URL, // ← استخدام المتغير التلقائي
+      ssl: {
+        rejectUnauthorized: false, // ضروري لـ Railway
+      },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
-      ssl:
-        process.env.NODE_ENV === 'production'
-          ? {
-              rejectUnauthorized: true,
-              ca: process.env.MYSQL_SSL_CA, // إضافة شهادة SSL إذا لزم الأمر
-            }
-          : null,
-      extra: {
-        connectionLimit: 10, // إدارة اتصالات قاعدة البيانات
-      },
+
+      // driver: mysql2,
+      // host: process.env.MYSQLHOST || 'localhost', // إضافة قيمة افتراضية للتطوير المحلي
+      // port: parseInt(process.env.MYSQLPORT, 10) || 3306,
+      // username: process.env.MYSQLUSER || 'LOAI',
+      // password: process.env.MYSQLPASSWORD || '1234',
+      // database: process.env.MYSQLDATABASE || 'FREELANCER_DB',
+      // entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      // autoLoadEntities: true,
+      // synchronize: process.env.NODE_ENV !== 'production',
+      // ssl:
+      //   process.env.NODE_ENV === 'production'
+      //     ? {
+      //         rejectUnauthorized: true,
+      //         ca: process.env.MYSQL_SSL_CA, // إضافة شهادة SSL إذا لزم الأمر
+      //       }
+      //     : null,
+      // extra: {
+      //   connectionLimit: 10, // إدارة اتصالات قاعدة البيانات
+      // },
     }),
     ServeStaticModule.forRoot({
       // نقدم مجلد "src/infrastructure/storage" كأصول ثابتة
