@@ -86,8 +86,8 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       // },
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src/infrastructure/storage/uploads'),
-      serveRoot: '/src/infrastructure/storage/uploads',
+      rootPath: join(__dirname, '..', 'src/infrastructure/storage'),
+      serveRoot: '/src/infrastructure/storage',
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your_default_secret',
