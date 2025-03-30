@@ -29,12 +29,14 @@ import { ActivityService } from '@/modules/activities/activity.service';
 import { ActivityGateway } from '@/modules/activities/activity.gateway';
 import { SchedulerService } from '@/modules/activities/scheduler.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PrometheusModule.register(),
     // CacheModule.register({
     //   store: redisStore,
     //   host: 'localhost',
@@ -75,10 +77,8 @@ import { JwtModule } from '@nestjs/jwt';
       // },
     }),
     ServeStaticModule.forRoot({
-      // نقدم مجلد "src/infrastructure/storage" كأصول ثابتة
-      rootPath: join(__dirname, '..', 'src/infrastructure/storage'),
-      // تصبح الملفات متاحة على URL يبدأ بـ "/src/infrastructure/storage"
-      serveRoot: '/src/infrastructure/storage',
+      rootPath: join(__dirname, '..', 'storage'),
+      serveRoot: '/storage',
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your_default_secret',
