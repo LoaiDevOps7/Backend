@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-// import { RedisIoAdapter } from './redis-io.adapter';
+import { RedisIoAdapter } from './redis-io.adapter';
 import { resolve } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
@@ -19,8 +19,8 @@ async function bootstrap() {
   app.use(compression());
 
   // تفعيل Redis WebSocket Adapter
-  // const redisIoAdapter = new RedisIoAdapter(app);
-  // app.useWebSocketAdapter(redisIoAdapter);
+  const redisIoAdapter = new RedisIoAdapter(app);
+  app.useWebSocketAdapter(redisIoAdapter);
 
   // إعداد الحد الأقصى للطلبات باستخدام قيم من .env
   const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10) || 100;

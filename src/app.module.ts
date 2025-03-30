@@ -4,7 +4,7 @@ import { RolesGuard } from '@/core/guards/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
-// import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { UserModule } from '@/modules/users/users.module';
 import { NotificationModule } from '@/modules/notifications/notification.module';
@@ -14,7 +14,7 @@ import { SubscriptionModule } from '@/modules/subscriptions/subscription.module'
 import { PackageModule } from '@/modules/packages/package.module';
 import { KycModule } from '@/modules/kyc/kyc.module';
 import { CategoryModule } from '@/modules/categories/categories.module';
-// import * as redisStore from 'cache-manager-redis-store';
+import * as redisStore from 'cache-manager-redis-store';
 // import * as mysql2 from 'mysql2';
 import { BidModule } from '@/modules/bids/bid.module';
 import { ProjectModule } from '@/modules/projects/projects.module';
@@ -37,11 +37,12 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       isGlobal: true,
     }),
     PrometheusModule.register(),
-    // CacheModule.register({
-    //   store: redisStore,
-    //   host: 'localhost',
-    //   port: 6379,
-    // }),
+    CacheModule.register({
+      store: redisStore,
+      url: process.env.REDIS_URL,
+      ttl: 3600, // 1 hour
+      tls: process.env.NODE_ENV === 'production' ? {} : undefined,
+    }),
     ThrottlerModule.forRoot({
       ttl: 30,
       limit: 20,
