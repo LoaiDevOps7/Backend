@@ -14,13 +14,9 @@ export class RedisIoAdapter extends IoAdapter {
     if (!RedisIoAdapter.pubClient || !RedisIoAdapter.subClient) {
       const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-      RedisIoAdapter.pubClient = new Redis(redisUrl, {
-        tls: { rejectUnauthorized: false },
-      });
+      RedisIoAdapter.pubClient = new Redis(redisUrl);
 
-      RedisIoAdapter.subClient = new Redis(redisUrl, {
-        tls: { rejectUnauthorized: false },
-      });
+      RedisIoAdapter.subClient = new Redis(redisUrl);
 
       // معالجة الأخطاء
       RedisIoAdapter.pubClient.on('error', (err) => {

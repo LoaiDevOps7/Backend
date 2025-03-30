@@ -8,14 +8,7 @@ export class ActivityService {
   constructor() {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
     // استخدم Redis.default لإنشاء الكائن
-    this.redisClient = new Redis.default(redisUrl, {
-      tls:
-        process.env.NODE_ENV === 'production'
-          ? {
-              rejectUnauthorized: false, // مطلوب لتجاوز أخطاء الشهادة في Railway
-            }
-          : undefined,
-    });
+    this.redisClient = new Redis.default(redisUrl);
 
     this.redisClient.on('error', (err) => {
       console.error('Redis Client Error:', err);
