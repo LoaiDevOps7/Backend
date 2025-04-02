@@ -186,6 +186,8 @@ export class KycPersonalInfoService {
     const currentVerificationStatus =
       await this.kycVerificationService.getVerification(userId);
 
+    console.log(currentVerificationStatus);
+
     // التحقق من تغيير أي من الحقول الحساسة
     const requiresVerificationReset = sensitiveFields.some(
       (field) =>
