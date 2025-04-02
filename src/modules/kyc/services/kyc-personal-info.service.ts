@@ -12,6 +12,7 @@ import { KycVerificationService } from './kyc-verification.service';
 import { VerificationStatus } from '../dto/create-kyc-verification.dto';
 import { Job } from '../entitys/job.entity';
 import { Skill } from '../entitys/skill.entity';
+import { KycVerification } from '../entitys/kyc-verification.entity';
 
 @Injectable()
 export class KycPersonalInfoService {
@@ -169,6 +170,9 @@ export class KycPersonalInfoService {
       });
     }
 
+    // دمج البيانات الجديدة مع البيانات القديمة
+    const updatedKyc = { ...info, ...updatePersonalInfoDto };
+
     // تحديد الحقول الحساسة التي تستدعي إعادة التوثيق عند تغييرها
     const sensitiveFields: (keyof UpdatePersonalInfoDto)[] = [
       'firstName',
@@ -181,39 +185,33 @@ export class KycPersonalInfoService {
       'country',
       'jobName',
     ];
-
-    // التحقق من حالة التوثيق الحالية
-    const currentVerificationStatus =
-      await this.kycVerificationService.getVerification(userId);
-
-    // التحقق من تغيير أي من الحقول الحساسة
     const requiresVerificationReset = sensitiveFields.some(
       (field) =>
         updatePersonalInfoDto[field] !== undefined &&
         updatePersonalInfoDto[field] !== info[field],
     );
 
-    // معالجة حالة عدم وجود توثيق
-    if (!currentVerificationStatus) {
-      // تحديث المعلومات مباشرة للمستخدمين الجدد
-      await this.personalInfoRepository.update(userId, updatePersonalInfoDto);
-      return this.personalInfoRepository.save({
-        ...info,
-        ...updatePersonalInfoDto,
-      });
+    // محاولة استرجاع بيانات التوثيق للمستخدم
+    let verificationData: KycVerification | null = null;
+    try {
+      verificationData =
+        await this.kycVerificationService.getVerification(userId);
+    } catch (error) {
+      // إذا لم يتم العثور على بيانات التوثيق، نعتبرها غير موجودة ونتابع التحديث بدون إعادة تعيين
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
     }
 
-    if (requiresVerificationReset) {
-      // إعادة تعيين حالة التوثيق إذا تم تغيير حقول حساسة
-      this.kycVerificationService.updateVerificationStatus(
+    // إذا كانت بيانات التوثيق موجودة وتم تغيير حقول حساسة، نقوم بإعادة تعيين حالة التوثيق
+    if (verificationData && requiresVerificationReset) {
+      await this.kycVerificationService.updateVerificationStatus(
         userId,
         VerificationStatus.REJECTED,
       );
-      this.kycVerificationService.deleteVerificationAndImages(userId);
+      await this.kycVerificationService.deleteVerificationAndImages(userId);
     }
 
-    // في حالة تحديث الوظيفة أو المهارات فقط، لن يتم إعادة تعيين حالة التوثيق
-    const updatedKyc = { ...info, ...updatePersonalInfoDto };
     return this.personalInfoRepository.save(updatedKyc);
   }
 
