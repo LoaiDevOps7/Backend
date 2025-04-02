@@ -186,8 +186,6 @@ export class KycPersonalInfoService {
     const currentVerificationStatus =
       await this.kycVerificationService.getVerification(userId);
 
-    console.log(currentVerificationStatus);
-
     // التحقق من تغيير أي من الحقول الحساسة
     const requiresVerificationReset = sensitiveFields.some(
       (field) =>
@@ -195,17 +193,23 @@ export class KycPersonalInfoService {
         updatePersonalInfoDto[field] !== info[field],
     );
 
+    // معالجة حالة عدم وجود توثيق
     if (!currentVerificationStatus) {
+      // تحديث المعلومات مباشرة للمستخدمين الجدد
       await this.personalInfoRepository.update(userId, updatePersonalInfoDto);
-    } else {
-      if (requiresVerificationReset) {
-        // إعادة تعيين حالة التوثيق إذا تم تغيير حقول حساسة
-        this.kycVerificationService.updateVerificationStatus(
-          userId,
-          VerificationStatus.REJECTED,
-        );
-        this.kycVerificationService.deleteVerificationAndImages(userId);
-      }
+      return this.personalInfoRepository.save({
+        ...info,
+        ...updatePersonalInfoDto,
+      });
+    }
+
+    if (requiresVerificationReset) {
+      // إعادة تعيين حالة التوثيق إذا تم تغيير حقول حساسة
+      this.kycVerificationService.updateVerificationStatus(
+        userId,
+        VerificationStatus.REJECTED,
+      );
+      this.kycVerificationService.deleteVerificationAndImages(userId);
     }
 
     // في حالة تحديث الوظيفة أو المهارات فقط، لن يتم إعادة تعيين حالة التوثيق
