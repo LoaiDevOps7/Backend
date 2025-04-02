@@ -182,29 +182,32 @@ export class KycPersonalInfoService {
       'jobName',
     ];
 
-    let requiresVerificationReset = false;
-    for (const field of sensitiveFields) {
-      if (
+    // التحقق من حالة التوثيق الحالية
+    const currentVerificationStatus =
+      await this.kycVerificationService.getVerification(userId);
+
+    // التحقق من تغيير أي من الحقول الحساسة
+    const requiresVerificationReset = sensitiveFields.some(
+      (field) =>
         updatePersonalInfoDto[field] !== undefined &&
-        updatePersonalInfoDto[field] !== info[field]
-      ) {
-        requiresVerificationReset = true;
-        break;
+        updatePersonalInfoDto[field] !== info[field],
+    );
+
+    if (!currentVerificationStatus) {
+      await this.personalInfoRepository.update(userId, updatePersonalInfoDto);
+    } else {
+      if (requiresVerificationReset) {
+        // إعادة تعيين حالة التوثيق إذا تم تغيير حقول حساسة
+        this.kycVerificationService.updateVerificationStatus(
+          userId,
+          VerificationStatus.REJECTED,
+        );
+        this.kycVerificationService.deleteVerificationAndImages(userId);
       }
     }
 
     // في حالة تحديث الوظيفة أو المهارات فقط، لن يتم إعادة تعيين حالة التوثيق
     const updatedKyc = { ...info, ...updatePersonalInfoDto };
-
-    if (requiresVerificationReset) {
-      // إعادة تعيين حالة التوثيق إذا تم تغيير حقول حساسة
-      this.kycVerificationService.updateVerificationStatus(
-        userId,
-        VerificationStatus.REJECTED,
-      );
-      this.kycVerificationService.deleteVerificationAndImages(userId);
-    }
-
     return this.personalInfoRepository.save(updatedKyc);
   }
 
