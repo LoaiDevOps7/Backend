@@ -2,9 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { User } from '../users/users.entity';
 
@@ -25,7 +25,7 @@ export class Portfolio {
   @Column()
   imageUrl: string;
 
-  @OneToOne(() => User, (user) => user.portfolio)
+  @ManyToOne(() => User, (user) => user.portfolio)
   user: User;
 
   @CreateDateColumn()

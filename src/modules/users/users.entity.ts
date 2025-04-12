@@ -96,7 +96,7 @@ export class User {
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions: Transaction[];
 
-  @OneToOne(() => Portfolio, (portfolio) => portfolio.user)
+  @OneToMany(() => Portfolio, (portfolio) => portfolio.user)
   @JoinColumn()
   portfolio: Portfolio;
 
