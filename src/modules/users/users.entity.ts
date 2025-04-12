@@ -98,7 +98,7 @@ export class User {
 
   @OneToMany(() => Portfolio, (portfolio) => portfolio.user)
   @JoinColumn()
-  portfolio: Portfolio;
+  portfolio: Portfolio[];
 
   // التقييمات التي قام المستخدم بإعطائها
   @OneToMany(() => Rating, (rating) => rating.rater)
