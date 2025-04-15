@@ -13,7 +13,7 @@ import { AllWsExceptionsFilter } from '@/core/exceptions/all-ws-exceptions.filte
 @UseFilters(new AllWsExceptionsFilter())
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 })

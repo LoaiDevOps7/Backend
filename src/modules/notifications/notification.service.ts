@@ -209,6 +209,6 @@ export class NotificationService {
   }
 
   async getAllNotification() {
-    return this.notificationRepository.find()
+    return this.notificationRepository.find();
   }
 }
