@@ -6,12 +6,15 @@ import {
   UnauthorizedException,
   Req,
   Param,
+  Get,
+  UseGuards,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminService } from '../admin/admin.service';
+import { AuthGuard } from '@nestjs/passport';
 
 // DTO (كائن لنقل بيانات تسجيل الدخول)
 export class LoginDto {
@@ -147,6 +150,15 @@ export class AuthController {
       message: 'Token refreshed successfully',
       access_token,
       refresh_token,
+    };
+  }
+
+  @Get('validate-token')
+  @UseGuards(AuthGuard('jwt'))
+  validateToken(@Req() req: Request) {
+    return {
+      valid: true,
+      user: req.user,
     };
   }
 
