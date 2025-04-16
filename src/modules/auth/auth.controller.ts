@@ -91,20 +91,18 @@ export class AuthController {
 
     // تعيين الـ cookies مع إعدادات آمنة
     res.cookie('authToken', access_token, {
-      httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'none',
+      sameSite: 'strict',
     });
 
     res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'none',
+      sameSite: 'strict',
     });
 
-    return { message: 'Login successful', access_token, refresh_token };
+    return { access_token };
   }
 
   @Post('verify-email')
@@ -133,21 +131,18 @@ export class AuthController {
 
     // تحديث الكوكيز بالتوكنات الجديدة
     res.cookie('authToken', access_token, {
-      httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'none',
+      sameSite: 'strict',
     });
 
     res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'none',
+      sameSite: 'strict',
     });
 
     return {
-      message: 'Token refreshed successfully',
       access_token,
       refresh_token,
     };
