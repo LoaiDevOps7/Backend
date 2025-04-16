@@ -102,7 +102,7 @@ export class AuthController {
       sameSite: 'strict',
     });
 
-    return { access_token };
+    return { access_token, refresh_token };
   }
 
   @Post('verify-email')
