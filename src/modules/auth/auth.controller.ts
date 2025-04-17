@@ -123,7 +123,11 @@ export class AuthController {
       .cookie('authToken', access_token, cookieOptions.accessToken)
       .cookie('refreshToken', refresh_token, cookieOptions.refreshToken);
 
-    return { message: 'Login successful' };
+    return {
+      token: access_token,
+      refreshToken: refresh_token,
+      message: 'تم تسجيل الدخول بنجاح',
+    };
   }
 
   @Post('verify-email')
