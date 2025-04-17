@@ -35,7 +35,7 @@ export class AuthController {
     refreshToken: CookieOptions;
   } {
     const isProduction = process.env.NODE_ENV === 'production';
-    const mainDomain = this.extractMainDomain(host);
+    const mainDomain = isProduction ? this.extractMainDomain(host) : undefined;
 
     return {
       accessToken: {
@@ -128,6 +128,17 @@ export class AuthController {
       refreshToken: refresh_token,
       message: 'تم تسجيل الدخول بنجاح',
     };
+  }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
+    const host = req.headers.host || '';
+    const cookieOptions = this.getCookieOptions(host);
+
+    res
+      .clearCookie('authToken', cookieOptions.accessToken)
+      .clearCookie('refreshToken', cookieOptions.refreshToken)
+      .send({ message: 'Logged out successfully' });
   }
 
   @Post('verify-email')
