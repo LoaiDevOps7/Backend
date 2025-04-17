@@ -17,7 +17,7 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   app.use(compression());
-  // app.enable('trust proxy');
+  app.set('trust proxy', 1);
 
   // تفعيل Redis WebSocket Adapter
   const redisIoAdapter = new RedisIoAdapter(app);

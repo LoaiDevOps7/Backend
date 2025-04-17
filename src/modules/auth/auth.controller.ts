@@ -15,6 +15,7 @@ import { AuthDto } from './dto/auth.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminService } from '../admin/admin.service';
 import { AuthGuard } from '@nestjs/passport';
+import { CookieOptions } from 'express-serve-static-core';
 
 // DTO (كائن لنقل بيانات تسجيل الدخول)
 export class LoginDto {
@@ -29,27 +30,40 @@ export class AuthController {
     private readonly adminService: AdminService,
   ) {}
 
-  private getCookieOptions(isProduction: boolean): any {
-    const baseOptions = {
-      httpOnly: true,
-      path: '/',
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-      ...(isProduction && { partitioned: true }),
-    };
+  private getCookieOptions(host: string): {
+    accessToken: CookieOptions;
+    refreshToken: CookieOptions;
+  } {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const mainDomain = this.extractMainDomain(host);
 
     return {
       accessToken: {
-        ...baseOptions,
-        maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS) || 15 * 60 * 1000, // 15 دقيقة
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        domain: isProduction ? mainDomain : undefined,
+        partitioned: isProduction,
+        path: '/',
+        maxAge: 15 * 60 * 1000,
       },
       refreshToken: {
-        ...baseOptions,
-        maxAge:
-          Number(process.env.REFRESH_TOKEN_EXPIRY_MS) ||
-          7 * 24 * 60 * 60 * 1000, // 7 أيام
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        domain: isProduction ? mainDomain : undefined,
+        partitioned: isProduction,
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       },
     };
+  }
+
+  private extractMainDomain(host?: string): string | undefined {
+    if (!host) return undefined;
+    const parts = host.split('.');
+    if (parts.length > 2) return `.${parts.slice(-2).join('.')}`;
+    return `.${host}`;
   }
 
   @Post('admin/create')
@@ -65,6 +79,7 @@ export class AuthController {
   async loginAdmin(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ) {
     const admin = await this.authService.validateAdmin(
       loginDto.username,
@@ -77,8 +92,8 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.loginAdmin(admin);
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieOptions = this.getCookieOptions(isProduction);
+    const host = req.headers.host || '';
+    const cookieOptions = this.getCookieOptions(host);
 
     res
       .cookie('authToken', access_token, cookieOptions.accessToken)
@@ -96,12 +111,13 @@ export class AuthController {
   async login(
     @Body() loginDto: AuthDto,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ) {
     const { access_token, refresh_token } =
       await this.authService.login(loginDto);
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieOptions = this.getCookieOptions(isProduction);
+    const host = req.headers.host || '';
+    const cookieOptions = this.getCookieOptions(host);
 
     res
       .cookie('authToken', access_token, cookieOptions.accessToken)
@@ -134,8 +150,8 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.refreshToken(refreshToken);
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const cookieOptions = this.getCookieOptions(isProduction);
+    const host = req.headers.host || '';
+    const cookieOptions = this.getCookieOptions(host);
 
     res
       .clearCookie('authToken', cookieOptions.accessToken)
