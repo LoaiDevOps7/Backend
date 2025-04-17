@@ -93,13 +93,13 @@ export class AuthController {
     res.cookie('authToken', access_token, {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     res.cookie('refreshToken', refresh_token, {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     return { access_token, refresh_token };
@@ -133,13 +133,13 @@ export class AuthController {
     res.cookie('authToken', access_token, {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     res.cookie('refreshToken', refresh_token, {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     return {
