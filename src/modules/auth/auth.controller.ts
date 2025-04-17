@@ -29,6 +29,29 @@ export class AuthController {
     private readonly adminService: AdminService,
   ) {}
 
+  private getCookieOptions(isProduction: boolean): any {
+    const baseOptions = {
+      httpOnly: true,
+      path: '/',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      ...(isProduction && { partitioned: true }),
+    };
+
+    return {
+      accessToken: {
+        ...baseOptions,
+        maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS) || 15 * 60 * 1000, // 15 دقيقة
+      },
+      refreshToken: {
+        ...baseOptions,
+        maxAge:
+          Number(process.env.REFRESH_TOKEN_EXPIRY_MS) ||
+          7 * 24 * 60 * 60 * 1000, // 7 أيام
+      },
+    };
+  }
+
   @Post('admin/create')
   async createAdmin(
     @Body('username') username: string,
@@ -54,26 +77,14 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.loginAdmin(admin);
 
-    // تعيين الـ cookies مع إعدادات آمنة
-    res.cookie('authToken', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      // domain: process.env.COOKIE_DOMAIN, // تأكد من ضبط هذا المتغير
-      path: '/',
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = this.getCookieOptions(isProduction);
 
-    res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      // domain: process.env.COOKIE_DOMAIN,
-      path: '/',
-    });
+    res
+      .cookie('authToken', access_token, cookieOptions.accessToken)
+      .cookie('refreshToken', refresh_token, cookieOptions.refreshToken);
 
-    return { message: 'Login successful', access_token, refresh_token };
+    return { message: 'Login successful' };
   }
 
   @Post('register')
@@ -89,23 +100,12 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.login(loginDto);
 
-    res.cookie('authToken', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 15 * 60 * 1000,
-      sameSite: 'lax',
-      // domain: process.env.COOKIE_DOMAIN,
-      path: '/',
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = this.getCookieOptions(isProduction);
 
-    res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      // domain: process.env.COOKIE_DOMAIN,
-      path: '/',
-    });
+    res
+      .cookie('authToken', access_token, cookieOptions.accessToken)
+      .cookie('refreshToken', refresh_token, cookieOptions.refreshToken);
 
     return { message: 'Login successful' };
   }
@@ -134,23 +134,14 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.refreshToken(refreshToken);
 
-    res.cookie('authToken', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 15 * 60 * 1000,
-      sameSite: 'lax',
-      // domain: process.env.COOKIE_DOMAIN,
-      path: '/',
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = this.getCookieOptions(isProduction);
 
-    res.cookie('refreshToken', refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      // domain: process.env.COOKIE_DOMAIN,
-      path: '/',
-    });
+    res
+      .clearCookie('authToken', cookieOptions.accessToken)
+      .clearCookie('refreshToken', cookieOptions.refreshToken)
+      .cookie('authToken', access_token, cookieOptions.accessToken)
+      .cookie('refreshToken', refresh_token, cookieOptions.refreshToken);
 
     return { access_token };
   }
