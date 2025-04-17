@@ -89,20 +89,25 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.login(loginDto);
 
-    // تعيين الـ cookies مع إعدادات آمنة
     res.cookie('authToken', access_token, {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/',
     });
 
     res.cookie('refreshToken', refresh_token, {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/',
     });
 
-    return { access_token, refresh_token };
+    return { message: 'Login successful' };
   }
 
   @Post('verify-email')
@@ -129,23 +134,25 @@ export class AuthController {
     const { access_token, refresh_token } =
       await this.authService.refreshToken(refreshToken);
 
-    // تحديث الكوكيز بالتوكنات الجديدة
     res.cookie('authToken', access_token, {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
-      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/',
     });
 
     res.cookie('refreshToken', refresh_token, {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
-      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      domain: process.env.COOKIE_DOMAIN,
+      path: '/',
     });
 
-    return {
-      access_token,
-      refresh_token,
-    };
+    return { access_token };
   }
 
   @Get('validate-token')
