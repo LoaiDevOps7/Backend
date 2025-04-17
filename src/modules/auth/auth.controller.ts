@@ -60,7 +60,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.ACCESS_TOKEN_EXPIRY_MS),
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN, // تأكد من ضبط هذا المتغير
+      // domain: process.env.COOKIE_DOMAIN, // تأكد من ضبط هذا المتغير
       path: '/',
     });
 
@@ -69,7 +69,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Number(process.env.REFRESH_TOKEN_EXPIRY_MS),
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       path: '/',
     });
 
@@ -94,7 +94,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       path: '/',
     });
 
@@ -103,7 +103,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       path: '/',
     });
 
@@ -139,7 +139,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       path: '/',
     });
 
@@ -148,7 +148,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      domain: process.env.COOKIE_DOMAIN,
+      // domain: process.env.COOKIE_DOMAIN,
       path: '/',
     });
 
